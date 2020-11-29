@@ -67,17 +67,18 @@ def index():
             return render_template('index.html', mostUsedWords = topDict)
         else:
             return render_template('index.html')
+    else:
+        return render_template('index.html')
 
-
-def searchForWordInDB(str):
+def searchForWordInDB(some_string):
     documents = collection.find()
-    word = str
+    word = some_string
     count = 0
-    if collection.find( { str : { str: "$regex" } } ):
+    if collection.find( { some_string : { some_string: "$regex" } } ):
         for key, value in documents.next().items():
             documentValue = value
             documentKey = key
-            if documentKey == str:
+            if documentKey == some_string:
                 it = iter(documentValue.values())
                 word = next(it)
                 count = next(it)
@@ -115,16 +116,15 @@ def sudoRead():
         with open("./texts/" + str(item) + ".txt", "r", encoding="utf-8") as f:
             readContent = readContent + " " + f.read()
 
-def splitPlaintText(str):
-    preResult = createDictionary(str)
-    print(preResult)
+def splitPlaintText(some_string):
+    preResult = createDictionary(some_string)
     result = deleteSecondaryWords(preResult)
     return result
 
 
-def createDictionary(str):
+def createDictionary(some_string):
     counts = dict()
-    tokens = nltk.word_tokenize(str.lower())
+    tokens = nltk.word_tokenize(some_string.lower())
     for word in tokens:
         if word not in counts.keys():
             counts[word] = 0
@@ -137,64 +137,27 @@ def createDictionary(str):
     return endDictionary
 
 
-def deleteSecondaryWords(dict):
-    del dict['і']
-    del dict['в']
-    del dict['у']
-    del dict['не']
-    del dict['що']
-    del dict['на']
-    del dict['до']
-    del dict['нас']
-    del dict['–']
-    del dict['а']
-    del dict['він']
-    del dict['є']
-    del dict['з']
-    del dict['як']
-    del dict['я']
-    del dict['це']
-    del dict['ми']
-    del dict['його']
-    del dict['про']
-    del dict['хто']
-    del dict['коли']
-    del dict['за']
-    del dict['нам'] 
-    del dict['’']
-    del dict['!']
-    del dict[',']
-    del dict['»']
-    del dict['«']
-    del dict[':']
-    del dict['та']
-    del dict['які']
-    del dict['для']
-    del dict['те']
-    del dict['щоб']
-    del dict['того']
-    del dict['її']
-    del dict['але']
-    del dict['бо']
-    del dict['той']
-    del dict['?']
-    del dict['який']
-    del dict['яка']
-    del dict['ті']
+def deleteSecondaryWords(some_dictionary):
+    secondaryWords = ['і' , 'в', 'у', 'не', 'що', 'на', 'до', 'нас', '-', 'а', 'він', 'є', 'з', 'як', 'я', 'це', 'ми', 'його', 'про',
+                    'хто', 'коли', 'за', 'нам', '’', '!', ',', '»', '«', ':', 'та', 'які', 'для', 'те', 'щоб', 'того', 'її', 'але', 'бо',
+                    'той', '?', 'який', 'яка', 'ті']
+    for item in secondaryWords:
+        del some_dictionary[item]
 
-    return dict
+    return some_dictionary
 
 def findMostUsedWords():
     top = 0
+    howMuchToFind = 3
     topList = []
     documents = collection.find()
     for item in documents.next().items():
-        if top < 4:
+        if top < (howMuchToFind + 1):       # Takes also first document 'objectID'
             topList.append(item)
             top += 1
         else:
-            break
-    topList.pop(0)
+            break  
+    topList.pop(0)  # Removes 'objectID'
 
     topDictionary = dict()
     topDictionary[topList[0][1]['word']] = topList[0][1]['count']
@@ -215,4 +178,4 @@ def isPhraseIn(phrase, text):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080,debug=False)
+    app.run(host='0.0.0.0', port=80, debug=False)
