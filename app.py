@@ -5,16 +5,25 @@
 import pyparsing as pp
 import pymongo
 import nltk
+import os, sys
 import re
 import string
 from pymongo import MongoClient
 from flask import Flask, render_template, request, url_for
 from collections import Counter
 
+# Flask
 application = app = Flask(__name__)
+
+# Database
 cluster = MongoClient("mongodb+srv://dbUser:CQrPZIykkXRAbJDA@cluster0.vairi.mongodb.net/texts?retryWrites=true&w=majority")
 db = cluster["texts"]
 collection = db["texts"]
+
+# Paths
+root = os.path.dirname(os.path.abspath(__file__))
+texts_path = root + "\\texts\\"
+
 
 # Variables
 textDictionary = dict()
@@ -26,6 +35,8 @@ frequencyOfPhrases = 0
 isPhrase = False
 
 
+
+# Methods
 @app.route('/', methods = ['POST', 'GET'])
 def index():
 
@@ -36,10 +47,6 @@ def index():
     global isPhrase
     global readContent
 
-    # Writing data to the DB
-    if(collection.count() == 0):
-        searchForWords()
-        makeDictionaryForDB()
 
     # Getting form's values
     processSearchButton = request.form.get('processSearch')
@@ -102,19 +109,25 @@ def searchForWords():
     global textDictionary
     global readContent
 
+    dirs = os.listdir(texts_path)
 
-    for item in range(1,42):
-        with open("./texts/" + str(item) + ".txt", "r", encoding="utf-8") as f:
-            readContent = readContent + " " + f.read()
+    for item in dirs:
+        with open(item) as f:
+            if os.path.isfile(texts_path + item):
+                readContent = readContent + " " + f.read()
 
     textDictionary = splitPlaintText(readContent)
 
 def sudoRead():
     global readContent
 
-    for item in range(1,42):
-        with open("./texts/" + str(item) + ".txt", "r", encoding="utf-8") as f:
-            readContent = readContent + " " + f.read()
+    dirs = os.listdir(texts_path)
+
+    for item in dirs:
+        with open(item) as f:
+            if os.path.isfile(texts_path + item):
+                readContent = readContent + " " + f.read()
+            
 
 def splitPlaintText(some_string):
     preResult = createDictionary(some_string)
@@ -178,4 +191,10 @@ def isPhraseIn(phrase, text):
 
 
 if __name__ == "__main__":
+    # Writing data to the DB
+    if(collection.count_documents == 0):
+        searchForWords()
+        makeDictionaryForDB()
+
+
     app.run(host='0.0.0.0', port=80, debug=False)
