@@ -1,3 +1,7 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
 import pyparsing as pp
 import pymongo
 import nltk
