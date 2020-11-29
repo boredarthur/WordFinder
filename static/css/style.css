@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+
+    font-family: 'Montserrat', sans-serif;
+}
+
+.content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    height: 100vh;
+    background-color: #fdcb6e;
+}
+
+.heading{
+    font-size: 2.3rem;
+    font-weight: 400;
+    margin-bottom: 2rem;
+}
+
+.content form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    height: 200px;
+    width: 500px;
+}
+
+.buttons{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.field{
+    height: 50px;
+    width: 450px;
+
+    border: none;
+    padding-left: 15px;
+}
+
+.field:focus{
+    outline: none;
+}
+
+.field::placeholder{
+    opacity: 1;
+    transition: all .5s ease;
+}
+
+.field:focus::placeholder{
+    opacity: 0;
+}
+
+.buttons{
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.button{
+    width: 200px;
+    height: 30px;
+    border: none;
+    cursor: pointer;
+
+    color: white;
+    background-color: #e17055;
+}
+
+.button:focus{
+    outline: none;
+}
+
+.result{
+    font-weight: 500;
+    margin-top: 2rem;
+    font-size: 1.2rem;
+}
+
+.unsuccessful{
+    color: #d63031;
+}
+
+.word{
+    font-weight: 900;
+}
+
+.count{
+    color: #00b894;
+    font-weight: 900;
+    font-size: 1.7rem;
+}
+
+.most_often{
+    width: 250px;
+    height: 30px;
+    border: none;
+    cursor: pointer;
+
+    color: white;
+    background-color:#e17055;
+}
+
+.most_often:focus{
+    outline: none;
+}
+
+.list-wrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.mostUsedWords-list{
+    width: 700px;
+    list-style: none;
+}
+
+.mostUsedWords-item{
+    margin: 1rem 0;
+}

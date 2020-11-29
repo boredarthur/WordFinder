@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Знайти кількість слів у текстах</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <section class="content">
+        <h1 class="heading">Яке слово хочете знайти?</h1>
+        <form action="/" method="POST">
+            <input class="field" type="text" name="searchableWord" placeholder="Введіть слово" autocomplete="off">
+            <input class="button" type="submit" name="processSearch" value="Порахувати вживаність">
+            <input class="most_often" type="submit" name="processSearchingWords" value="Знайти найбільш вживані слова">
+        </form>
+
+        {% if phraseCount is defined and isPhrase %}
+            {% if word|length and phraseCount == 1 %}
+                <p class="result">Словосполучення "<span class="word">{{ word }}</span> було вжито <span class="count">{{ phraseCount }}</span> раз</p>
+            {% elif word|length and phraseCount % 10 == 2 or phraseCount % 10 == 3 or phraseCount % 10 == 4 %}
+                <p class="result">Словосполучення "<span class="word">{{ word }}</span>" було вжито <span class="count">{{ phraseCount }}</span> рази</p>
+            {% elif word|length and phraseCount > 5%}
+                <p class="result">Словосполучення "<span class="word">{{ word }}</span>" було вжито <span class="count">{{ phraseCount }}</span> разів</p>
+            {% elif phraseCount == 0 %}
+                <p class="result unsuccessful">Ми не знайшли такого словосполучення</p>
+            {% else %}
+                <p class="result unsuccessful">Ви залишили поле пустим</p>
+            {% endif %}
+        {% endif %}
+
+        {% if count is defined and not isPhrase %}
+            {% if word|length and count == 1 %}
+                <p class="result">Слово "<span class="word">{{ word }}</span>" було вжито <span class="count">{{ count }}</span> раз</p>
+            {% elif word|length and count % 10 == 2 or count % 10 == 3 or count % 10 == 4 %}
+                <p class="result">Слово "<span class="word">{{ word }}</span>" було вжито <span class="count">{{ count }}</span> рази</p>
+            {% elif word|length and count > 5 %}
+                <p class="result">Слово "<span class="word">{{ word }}</span>" було вжито <span class="count">{{ count }}</span> разів</p>
+            {% elif count == 0 %}
+                <p class="result unsuccessful">Ми не знайшли такого слова</p>
+            {% else %}
+                <p class="result unsuccessful">Ви залишили поле пустим</p>
+            {% endif %}
+        {% endif %}
+
+        <div class="list-wrapper">
+            {% if mostUsedWords|length %}
+                <p class="result">Найбільш вживані слова:</p>
+                    <ul class="mostUsedWords-list">
+                            {% for key, value in mostUsedWords.items() %}
+                                {% if value % 10 == 2 or value % 10 == 3 or value % 10 == 4 %}
+                                    <li class="mostUsedWords-item">Слово "<span class="word">{{ key }}</span>" було вжито <span class="count">{{ value }}</span> раз</li>
+                                {% else %}
+                                    <li class="mostUsedWords-item">Слово "<span class="word">{{ key }}</span>" було вжито <span class="count">{{ value }}</span> разів</li>
+                                {% endif %}
+                            {% endfor %}
+                    </ul>
+            {% endif %}
+        </div>
+    </section>
+</body>
+</html>
