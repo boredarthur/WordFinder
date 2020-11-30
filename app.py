@@ -28,6 +28,7 @@ texts_path = root + "/texts/"
 # Variables
 textDictionary = dict()
 dictionaryForDB = dict()
+searchableWordFormInput = ""
 searchableWord = ""
 readContent = ""
 frequencyOfSearchableWord = 0
@@ -43,6 +44,7 @@ def index():
 
     # Getting variables
     global textDictionary
+    global searchableWordFormInput
     global searchableWord
     global frequencyOfSearchableWord
     global isPhrase
@@ -57,7 +59,10 @@ def index():
 
         # Handling button clicks
         if processSearchButton == "Порахувати вживаність":
-            searchableWord = request.form['searchableWord']
+            searchableWordFormInput = request.form['searchableWord']
+
+            searchableWord = searchableWordFormInput.lstrip()
+
             if containsMultipleWords(searchableWord):
                 isPhrase = True
                 if collection.count() != 0:
@@ -66,7 +71,7 @@ def index():
 
             else:
                 isPhrase = False
-                frequencyOfSearchableWord = searchForWordInDB(searchableWord)[1]
+                frequencyOfSearchableWord = searchForWordInDB()[1]
                 
             return render_template('index.html', count = frequencyOfSearchableWord, word = searchableWord , isPhrase = isPhrase, phraseCount = frequencyOfPhrases)
 
@@ -78,17 +83,20 @@ def index():
     else:
         return render_template('index.html')
 
-def searchForWordInDB(some_string):
-    word = some_string
+def searchForWordInDB():
+    word = searchableWord
     count = 0
+    
 
+    documents = list(collection.find({ "word": word }))
+    if len(documents) != 0:
+        word = documents[0]['word']
+        count = documents[0]['count']
 
-    documents = list(collection.find({ "word": searchableWord }))
-    word = documents[0]['word']
-    count = documents[0]['count']
-
-
-    return word, count
+        return word, count
+    else:
+        return word, count
+    
 
 def makeDictionaryForDB():
     for key, value in textDictionary.items():
@@ -121,7 +129,7 @@ def sudoRead():
     dirs = os.listdir(texts_path)
 
     for item in dirs:
-        with open(texts_path + item) as f:
+        with open(texts_path + item, encoding="utf8") as f:
             if os.path.isfile(texts_path + item):
                 readContent = readContent + " " + f.read()
             
@@ -150,7 +158,7 @@ def createDictionary(some_string):
 def deleteSecondaryWords(some_dictionary):
     secondaryWords = ['і' , 'в', 'у', 'не', 'що', 'на', 'до', 'нас', '–', 'а', 'він', 'є', 'з', 'як', 'я', 'це', 'ми', 'його', 'про',
                     'хто', 'коли', 'за', 'нам', '’', '!', ',', '»', '«', ':', 'та', 'які', 'для', 'те', 'щоб', 'того', 'її', 'але', 'бо',
-                    'той', '?', 'який', 'яка', 'ті']
+                    'той', '?', 'який', 'яка', 'ті', 'від']
     for item in secondaryWords:
         del some_dictionary[item]
 
