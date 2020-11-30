@@ -22,7 +22,7 @@ collection = db["texts"]
 
 # Paths
 root = os.path.dirname(os.path.abspath(__file__))
-texts_path = root + "\\texts\\"
+texts_path = root + "/texts/"
 
 
 # Variables
@@ -33,6 +33,7 @@ readContent = ""
 frequencyOfSearchableWord = 0
 frequencyOfPhrases = 0
 isPhrase = False
+
 
 
 
@@ -78,28 +79,24 @@ def index():
         return render_template('index.html')
 
 def searchForWordInDB(some_string):
-    documents = collection.find()
     word = some_string
     count = 0
-    if collection.find( { some_string : { some_string: "$regex" } } ):
-        for key, value in documents.next().items():
-            documentValue = value
-            documentKey = key
-            if documentKey == some_string:
-                it = iter(documentValue.values())
-                word = next(it)
-                count = next(it)
+
+
+    documents = list(collection.find({ "word": searchableWord }))
+    word = documents[0]['word']
+    count = documents[0]['count']
+
 
     return word, count
 
 def makeDictionaryForDB():
     for key, value in textDictionary.items():
-        dictionaryForDB[key] = {
+        dictionaryForDB = {
             "word": key,
             "count": value
         }
-
-    collection.insert_one(dictionaryForDB)
+        collection.insert_one(dictionaryForDB)
 
 
 def containsMultipleWords(s):
@@ -112,7 +109,7 @@ def searchForWords():
     dirs = os.listdir(texts_path)
 
     for item in dirs:
-        with open(item) as f:
+        with open(texts_path + item, encoding="utf8") as f:
             if os.path.isfile(texts_path + item):
                 readContent = readContent + " " + f.read()
 
@@ -124,7 +121,7 @@ def sudoRead():
     dirs = os.listdir(texts_path)
 
     for item in dirs:
-        with open(item) as f:
+        with open(texts_path + item) as f:
             if os.path.isfile(texts_path + item):
                 readContent = readContent + " " + f.read()
             
@@ -151,7 +148,7 @@ def createDictionary(some_string):
 
 
 def deleteSecondaryWords(some_dictionary):
-    secondaryWords = ['і' , 'в', 'у', 'не', 'що', 'на', 'до', 'нас', '-', 'а', 'він', 'є', 'з', 'як', 'я', 'це', 'ми', 'його', 'про',
+    secondaryWords = ['і' , 'в', 'у', 'не', 'що', 'на', 'до', 'нас', '–', 'а', 'він', 'є', 'з', 'як', 'я', 'це', 'ми', 'його', 'про',
                     'хто', 'коли', 'за', 'нам', '’', '!', ',', '»', '«', ':', 'та', 'які', 'для', 'те', 'щоб', 'того', 'її', 'але', 'бо',
                     'той', '?', 'який', 'яка', 'ті']
     for item in secondaryWords:
@@ -160,22 +157,14 @@ def deleteSecondaryWords(some_dictionary):
     return some_dictionary
 
 def findMostUsedWords():
-    top = 0
     howMuchToFind = 3
     topList = []
-    documents = collection.find()
-    for item in documents.next().items():
-        if top < (howMuchToFind + 1):       # Takes also first document 'objectID'
-            topList.append(item)
-            top += 1
-        else:
-            break  
-    topList.pop(0)  # Removes 'objectID'
-
     topDictionary = dict()
-    topDictionary[topList[0][1]['word']] = topList[0][1]['count']
-    topDictionary[topList[1][1]['word']] = topList[1][1]['count']
-    topDictionary[topList[2][1]['word']] = topList[2][1]['count']
+   
+    topList = list(collection.find(sort=[("count", -1)]).limit(howMuchToFind))
+    
+    for list_item in range(3):
+        topDictionary[topList[list_item]['word']] = topList[list_item]['count']
 
     return topDictionary
 
@@ -192,9 +181,8 @@ def isPhraseIn(phrase, text):
 
 if __name__ == "__main__":
     # Writing data to the DB
-    if(collection.count_documents == 0):
+    if(collection.estimated_document_count() == 0):
         searchForWords()
         makeDictionaryForDB()
 
-
-    app.run(host='0.0.0.0', port=80, debug=False)
+    app.run(host="0.0.0.0", port=8080)
