@@ -2,15 +2,22 @@
 # -*- coding: utf-8 -*-
 
 
-import pyparsing as pp
-import pymongo
-import nltk
-import os, sys
-import re
-import string
-from pymongo import MongoClient
+# What is used for this app:
+# - Flask framework
+# - MongoDB (pymongo module)
+# - Natural Language ToolKit
+# - PyParsing
+# - Amazon Web Services
+
+
+# Imports
 from flask import Flask, render_template, request, url_for
-from collections import Counter
+from pymongo import MongoClient
+import pyparsing as pp
+import pymongo          
+import os, sys
+import string
+import nltk
 
 # Flask
 application = app = Flask(__name__)
@@ -65,7 +72,7 @@ def index():
 
             if containsMultipleWords(searchableWord):
                 isPhrase = True
-                if collection.count() != 0:
+                if collection.estimated_document_count() != 0:
                     sudoRead()
                 isPhraseIn(searchableWord, readContent)
 
