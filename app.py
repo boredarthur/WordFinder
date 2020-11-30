@@ -174,7 +174,7 @@ def isPhraseIn(phrase, text):
     text = text.lower()
 
     rule = pp.ZeroOrMore(pp.Keyword(phrase))
-    for t in rule.scanString(text):
+    for t, e, s in rule.scanString(text):
         if t:
             frequencyOfPhrases += 1
 
